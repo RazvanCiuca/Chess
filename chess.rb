@@ -26,7 +26,12 @@ class Rook < Piece
     end
 
     possible_moves.delete([x, y])
-    possible_moves.select! {|i, j| i >= 0 && i < 8 && j >= 0 && j < 8 }
+    possible_moves.select! do |i, j|
+      within_board? = i >= 0 && i < 8 && j >= 0 && j < 8
+      if board[i][j]
+        color_not_same? = board[i][j].color != self.color
+      end
+    end
   end
 end
 
