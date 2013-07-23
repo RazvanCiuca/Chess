@@ -15,23 +15,32 @@ class Rook < Piece
     @symbol = "R"
   end
 
-  def possible_moves
+  def possible_moves(board)
     x, y  = @position[0], @position[1]
     possible_moves = []
-    (-7..7).each do |i|
-      possible_moves << [x + i, y]
-      possible_moves << [x - i, y]
-      possible_moves << [x, y + i]
-      possible_moves << [x, y - i]
-    end
+    directions = [[0,1],[0,-1],[1,0],[-1,0]]
+    directions.each do |i,j|
+      px, py = x, y
+      while true
+        px += i
+        py += j
+        print px," ", py
+        puts
+        break if px < 0 || px > 7 || py < 0 || py > 7
 
-    possible_moves.delete([x, y])
-    possible_moves.select! do |i, j|
-      within_board? = i >= 0 && i < 8 && j >= 0 && j < 8
-      if board[i][j]
-        color_not_same? = board[i][j].color != self.color
+        if !board[px][py].nil?
+          if board[px][py].color != @color
+            possible_moves << [px, py]
+          end
+          break
+        end
+
+        possible_moves << [px, py]
       end
+
     end
+    p possible_moves
+    possible_moves
   end
 end
 
@@ -93,7 +102,7 @@ class Board
     @board[0][5] = Bishop.new([0, 5], :black)
     @board[0][3] = Queen.new([0, 3], :black)
     @board[0][4] = King.new([0, 4], :black)
-    8.times do |i|
+    7.times do |i|
       @board[1][i] = Pawn.new([1, i], :black)
     end
 
@@ -157,8 +166,8 @@ class Game
     piece = @board[move[0]][move[1]]
     type = piece.class
     side = piece.color
-    possible_moves = piece.possible_moves
-    # print possible_moves
+    possible_moves = piece.possible_moves(@board)
+
     unless possible_moves.include?([move[2], move[3]])
       return false
     end
