@@ -49,6 +49,9 @@ class Game
 
       if check_for_check(1 - @turn, @board)
         if check_for_mate
+          p "#{@players[@turn]} crushed #{@players[1 - @turn]}"
+          break
+        end
         p "Check for #{1 - @player}"
       end
 
@@ -57,6 +60,30 @@ class Game
   end
 
   def check_for_mate
+    p "hi"
+    @board.each do |line|
+      line.each do |tile|
+        if tile && tile.color != COLOR_OF_PLAYERS[@turn]
+          possible_moves = tile.possible_moves(@board)
+          possible_moves.each do |destination|
+            move = tile.position + destination
+            new_board = @board_object.to_yaml
+            new_board = YAML.load(new_board)
+            if @board[move[0]][move[1]].symbol == "K"
+              @king_position[@turn] = move[2..3]
+            end
+            new_board.move(move[0..1], move[2..3])
+            new_board.board[move[2]][move[3]].position = move[2..3]
+
+            if !check_for_check(1 - @turn, new_board.board)
+              return false
+            end
+          end
+        end
+      end
+    end
+    true
+  end
 
   def bigger_move_method
     move = @players[@turn].move
@@ -96,7 +123,6 @@ class Game
     #check yourself before you wreck yourself
     if check_for_check(@turn, new_board.board)
       @king_position[@turn] = move[0..1]
-      p "hi"
       return false
     end
 
