@@ -64,6 +64,19 @@ class Game
     end
   end
 
+  def dup
+    new_board = Board.new(false)
+    @board.each_with_index do |line, i|
+      line.each_with_index do |tile, j|
+        if tile
+          new_board.board[i][j] = @board[i][j].class.new([i,j], tile.color)
+        end
+      end
+    end
+
+    new_board
+  end
+
   def check_for_mate
     p "Entering check_for_mate"
     @board.each do |line|
@@ -72,8 +85,7 @@ class Game
           possible_moves = tile.possible_moves(@board)
           possible_moves.each do |destination|
             move = tile.position + destination
-            new_board = @board_object.to_yaml
-            new_board = YAML.load(new_board)
+            new_board = dup
             if @board[move[0]][move[1]].symbol == "K"
               @king_position[1 - @turn] = move[2..3]
             end
@@ -122,8 +134,7 @@ class Game
       return false
     end
     #dup the board
-    new_board = @board_object.to_yaml
-    new_board = YAML.load(new_board)
+    new_board = dup
     if @board[move[0]][move[1]].symbol == "K"
       @king_position[@turn] = move[2..3]
     end
