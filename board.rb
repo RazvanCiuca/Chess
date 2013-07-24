@@ -1,5 +1,5 @@
 class Board
-  COLORS = {:white => :light_white, :black => :red}
+  COLORS = {:white => :yellow, :black => :black}
 
   attr_accessor :board
 
@@ -32,13 +32,16 @@ class Board
 
   def display
     puts "  a b c d e f g h"
+    background_colors = {0 => :light_white, 1 => :white}
     @board.each_with_index do |line, i|
       print "#{8 - i} "
-      line.each do |tile|
+      line.each_with_index do |tile, j|
+        color = (i + j) % 2
         if tile.nil?
-          print ". "
+
+          print "  ".colorize(:color => :green, :background => background_colors[color] )
         else
-          print tile.symbol.send(COLORS[tile.color]) + " "
+          print (tile.symbol+ " ").colorize( {:color => COLORS[tile.color], :background => background_colors[color]} )
         end
       end
       puts

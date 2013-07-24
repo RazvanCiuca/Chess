@@ -1,11 +1,4 @@
-class Test
-  attr_accessor :name
-  def initialize
-    @name = ["fluffy","puffy","huffy"].sample
-  end
+100.times do |i|
+  print i, " \e[#{i}mTEXT\e[0m"
+  puts
 end
-
-c = [[Test.new, Test.new], [Test.new, Test.new]]
-
-d = c.to_yaml
-d = YAML.load(d)

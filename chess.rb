@@ -1,3 +1,4 @@
+# encoding: utf-8
 require_relative "./pieces.rb"
 require_relative "./board.rb"
 require "colorize"
@@ -49,10 +50,14 @@ class Game
 
       if check_for_check(1 - @turn, @board)
         if check_for_mate
-          p "#{@players[@turn]} crushed #{@players[1 - @turn]}"
+          p "#{@players[@turn].color} crushed #{@players[1 - @turn].color}"
+          @board_object.display
           break
         end
-        p "Check for #{1 - @player}"
+        puts
+        print @king_position
+        puts
+        p "Check for #{1 - @turn}"
       end
 
       @turn = 1 - @turn
@@ -60,7 +65,7 @@ class Game
   end
 
   def check_for_mate
-    p "hi"
+    p "Entering check_for_mate"
     @board.each do |line|
       line.each do |tile|
         if tile && tile.color != COLOR_OF_PLAYERS[@turn]
@@ -70,16 +75,20 @@ class Game
             new_board = @board_object.to_yaml
             new_board = YAML.load(new_board)
             if @board[move[0]][move[1]].symbol == "K"
-              @king_position[@turn] = move[2..3]
+              @king_position[1 - @turn] = move[2..3]
             end
             new_board.move(move[0..1], move[2..3])
             new_board.board[move[2]][move[3]].position = move[2..3]
 
             if !check_for_check(1 - @turn, new_board.board)
+              @king_position[1 - @turn] = move[0..1]
               return false
             end
+            #@king_position[1 - @turn] = move[0..1]
           end
+
         end
+
       end
     end
     true
@@ -97,6 +106,7 @@ class Game
     end
 
     if @board[move[0]][move[1]].symbol == "K"
+      p "king shouldnt move here"
       @players[@turn].king_position = move[2..3]
     end
 
@@ -134,7 +144,7 @@ class Game
       line.each do |tile|
         if tile && tile.color != COLOR_OF_PLAYERS[player]
           danger_zone = tile.possible_moves(board)
-          if danger_zone.include?(@king_position[@turn])
+          if danger_zone.include?(@king_position[1 - @turn])
             return true
           end
         end

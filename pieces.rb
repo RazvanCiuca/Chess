@@ -1,3 +1,4 @@
+
 module Sliders
   def possible_moves(board)
     x, y  = @position[0], @position[1]
@@ -43,7 +44,7 @@ class Rook < Piece
 
   def initialize(position, color)
     super(position, color)
-    @symbol = "R"
+    @symbol = "\xe2\x99\x9c"
     @directions = [[0, 1], [0, -1], [1, 0], [-1, 0]]
   end
 end
@@ -51,7 +52,7 @@ end
 class Knight < Piece
   def initialize(position, color)
     super(position, color)
-    @symbol = "N"
+    @symbol = "\xe2\x99\x9e"
   end
 
   def possible_moves(board)
@@ -77,7 +78,7 @@ class Bishop < Piece
 
   def initialize(position, color)
     super(position, color)
-    @symbol = "B"
+    @symbol = "\xe2\x99\x9d"
     @directions = [[1, 1], [-1, -1], [-1, 1], [1, -1]]
   end
 end
@@ -87,7 +88,7 @@ class Queen < Piece
 
   def initialize(position, color)
     super(position, color)
-    @symbol = "Q"
+    @symbol = "\xe2\x99\x9b"
     @directions = [[1, 1], [-1, -1], [-1, 1], [1, -1],
                    [0, 1], [0, -1], [1, 0], [-1, 0]]
   end
@@ -96,7 +97,7 @@ end
 class King < Piece
   def initialize(position, color)
     super(position, color)
-    @symbol = "K"
+    @symbol = "\xe2\x99\x9a"
   end
 
   def possible_moves(board)
@@ -120,7 +121,7 @@ end
 class Pawn < Piece
   def initialize(position, color)
     super(position, color)
-    @symbol = "P"
+    @symbol = "\xe2\x99\x9f"
     @directions = [[-1, 0]]
   end
 
