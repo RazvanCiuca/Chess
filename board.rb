@@ -33,7 +33,7 @@ class Board
   def display
     puts "  a b c d e f g h"
     @board.each_with_index do |line, i|
-      print "#{7 - i} "
+      print "#{8 - i} "
       line.each do |tile|
         if tile.nil?
           print ". "
