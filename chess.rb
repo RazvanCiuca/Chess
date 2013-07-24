@@ -12,7 +12,8 @@ class HumanPlayer
   def move
     actual_move = []
     p "Enter your move, #{color}:"
-    move = gets.chomp.split(" ")
+    move = gets.chomp.split(" ") #get the input in a6 b5 format
+    #convert input into coordinates ([2, 0, 3, 1])
     move.each do |pos|
       actual_move << 8 - pos.split("")[1].to_i
       actual_move << MAP[pos.split("")[0]]
@@ -28,18 +29,17 @@ end
 
 class Game
 
-
   def initialize
     @board_object = Board.new
     @board = @board_object.board
     @players = [HumanPlayer.new(:white), HumanPlayer.new(:black)]
-    @turn = 0
+    @turn = 0 #first turn is white's
   end
 
   def play
     until false
       @board_object.display
-
+      #ask for input until it is valid, then make the move
       begin
         bigger_move_method
       rescue ArgumentError => e
@@ -98,16 +98,17 @@ class Game
   end
 
   def bigger_move_method
+    #get input from the HumanPlayer
     move = @players[@turn].move
-
+    #check if piece belong to the player whose turn it is
     unless @board[move[0]][move[1]].color == COLOR_OF_PLAYERS[@turn]
       raise ArgumentError.new "That's not your piece, bitch!"
     end
-
+    #check if the move is possible and if it doesn't expose you to check
     unless check_move(move)
       raise ArgumentError.new "Move is not valid"
     end
-
+    #perform the move
     @board_object.move(move[0..1], move[2..3])
     @board[move[2]][move[3]].position = move[2..3]
   end
@@ -130,9 +131,11 @@ class Game
 
   def check?(player, board_object)
     board = board_object.board
+    #for each of the opponent's pieces
     board.each do |line|
       line.each do |tile|
         if tile && tile.color != COLOR_OF_PLAYERS[player]
+          #check if player's king is in their list of possible moves
           danger_zone = tile.possible_moves(board)
           if danger_zone.include?(board_object.king_positions[player])
             return true

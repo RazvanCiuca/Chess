@@ -1,5 +1,5 @@
 # encoding: utf-8
-module Sliders
+module Sliders #possible movements of Rooks, Bishops and Queens
   def possible_moves(board)
     x, y  = @position[0], @position[1]
     possible_moves = []

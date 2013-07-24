@@ -37,7 +37,6 @@ class Board
       line.each_with_index do |tile, j|
         color = (i + j) % 2
         if tile.nil?
-
           print "  ".colorize(:color => :green, :background => background_colors[color] )
         else
           print (tile.symbol+ " ").colorize( {:color => COLORS[tile.color], :background => background_colors[color]} )
@@ -51,9 +50,11 @@ class Board
     o_x, o_y = origin
     d_x, d_y = destination
     tile = @board[o_x][o_y]
+    #track king movements
     if tile.symbol == "\xe2\x99\x9a"
       @king_positions[ COLOR_OF_PLAYERS[tile.color] ] = [d_x, d_y]
     end
+    #move piece from origin to destination and make the origin empty
     @board[d_x][d_y] = tile
     @board[o_x][o_y] = nil
   end
