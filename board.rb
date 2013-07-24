@@ -1,3 +1,4 @@
+#encoding: utf-8
 class Board
   COLORS = {:white => :yellow, :black => :black}
 

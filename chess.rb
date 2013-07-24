@@ -86,12 +86,13 @@ class Game
           possible_moves.each do |destination|
             move = tile.position + destination
             new_board = dup
-            if @board[move[0]][move[1]].symbol == "K"
+            if @board[move[0]][move[1]].symbol == "\xe2\x99\x9a"
               @king_position[1 - @turn] = move[2..3]
             end
             new_board.move(move[0..1], move[2..3])
             new_board.board[move[2]][move[3]].position = move[2..3]
-
+            # new_board.display
+#             p @king_position
             if !check_for_check(1 - @turn, new_board.board)
               @king_position[1 - @turn] = move[0..1]
               return false
@@ -117,7 +118,7 @@ class Game
       raise ArgumentError.new "Move is not valid"
     end
 
-    if @board[move[0]][move[1]].symbol == "K"
+    if @board[move[0]][move[1]].symbol == "\xe2\x99\x9a"
       p "king shouldnt move here"
       @players[@turn].king_position = move[2..3]
     end
@@ -135,7 +136,8 @@ class Game
     end
     #dup the board
     new_board = dup
-    if @board[move[0]][move[1]].symbol == "K"
+
+    if @board[move[0]][move[1]].symbol == "\xe2\x99\x9a"
       @king_position[@turn] = move[2..3]
     end
     new_board.move(move[0..1], move[2..3])
