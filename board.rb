@@ -1,32 +1,26 @@
 #encoding: utf-8
 class Board
-  COLORS = {:white => :yellow, :black => :black}
+  COLORS = {:white => :red, :black => :black}
 
   attr_accessor :board
 
-  def initialize(initial = true)
-    @board = Array.new(8) { Array.new(8, nil) }
-    if initial
-      @board[0][0] = Rook.new([0, 0], :black)
-      @board[0][7] = Rook.new([0, 7], :black)
-      @board[0][1] = Knight.new([0, 1], :black)
-      @board[0][6] = Knight.new([0, 6], :black)
-      @board[0][2] = Bishop.new([0, 2], :black)
-      @board[0][5] = Bishop.new([0, 5], :black)
-      @board[0][3] = Queen.new([0, 3], :black)
-      @board[0][4] = King.new([0, 4], :black)
+  def initialize(with_pieces = true)
+    @board = Array.new(8) { Array.new(8, nil) } #make 8 x 8 empty board
+    if with_pieces
+      pieces = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
+      #make black special pieces
+      pieces.each_with_index do |piece, i|
+        @board[0][i] = piece.new([0, i], :black)
+      end
+      #make white special pieces
+      pieces.each_with_index do |piece, i|
+        @board[7][i] = piece.new([7, i], :white)
+      end
+      #make black pawns
       8.times do |i|
         @board[1][i] = Pawn.new([1, i], :black)
       end
-
-      @board[7][0] = Rook.new([7, 0], :white)
-      @board[7][7] = Rook.new([7, 7], :white)
-      @board[7][1] = Knight.new([7, 1], :white)
-      @board[7][6] = Knight.new([7, 6], :white)
-      @board[7][2] = Bishop.new([7, 2], :white)
-      @board[7][5] = Bishop.new([7, 5], :white)
-      @board[7][3] = Queen.new([7, 3], :white)
-      @board[7][4] = King.new([7, 4], :white)
+      #make white pawns
       8.times do |i|
         @board[6][i] = Pawn.new([6, i], :white)
       end
@@ -54,7 +48,6 @@ class Board
   def move(origin, destination)
     origin_x, origin_y = origin
     destination_x, destination_y = destination
-
     @board[destination_x][destination_y] = @board[origin_x][origin_y]
     @board[origin_x][origin_y] = nil
   end

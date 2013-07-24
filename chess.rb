@@ -11,13 +11,13 @@ class HumanPlayer
 
   def move
     actual_move = []
-
     p "Enter your move, #{color}:"
     move = gets.chomp.split(" ")
     move.each do |pos|
       actual_move << 8 - pos.split("")[1].to_i
       actual_move << MAP[pos.split("")[0]]
     end
+
     actual_move
   end
 
@@ -47,16 +47,13 @@ class Game
         puts e.message
         retry
       end
-
-      if check_for_check(1 - @turn, @board)
-        if check_for_mate
-          p "#{@players[@turn].color} crushed #{@players[1 - @turn].color}"
+      #check if current player has checked his opponent
+      if check?(1 - @turn, @board)
+        if mate?
+          p "#{@players[@turn].color.capitalize} crushed #{@players[1 - @turn].color}"
           @board_object.display
           break
         end
-        puts
-        print @king_position
-        puts
         p "Check for #{1 - @turn}"
       end
 
@@ -77,8 +74,7 @@ class Game
     new_board
   end
 
-  def check_for_mate
-    p "Entering check_for_mate"
+  def mate?
     @board.each do |line|
       line.each do |tile|
         if tile && tile.color != COLOR_OF_PLAYERS[@turn]
@@ -91,13 +87,11 @@ class Game
             end
             new_board.move(move[0..1], move[2..3])
             new_board.board[move[2]][move[3]].position = move[2..3]
-            # new_board.display
-#             p @king_position
-            if !check_for_check(1 - @turn, new_board.board)
+            if !check?(1 - @turn, new_board.board)
               @king_position[1 - @turn] = move[0..1]
               return false
             end
-            #@king_position[1 - @turn] = move[0..1]
+
           end
 
         end
@@ -117,10 +111,9 @@ class Game
     unless check_move(move)
       raise ArgumentError.new "Move is not valid"
     end
-
+    #keep track of the Kings' positions
     if @board[move[0]][move[1]].symbol == "\xe2\x99\x9a"
-      p "king shouldnt move here"
-      @players[@turn].king_position = move[2..3]
+      @king_position[@turn] = move[2..3]
     end
 
     @board_object.move(move[0..1], move[2..3])
@@ -144,7 +137,7 @@ class Game
     new_board.board[move[2]][move[3]].position = move[2..3]
 
     #check yourself before you wreck yourself
-    if check_for_check(@turn, new_board.board)
+    if check?(@turn, new_board.board)
       @king_position[@turn] = move[0..1]
       return false
     end
@@ -152,7 +145,7 @@ class Game
     true
   end
 
-  def check_for_check(player, board)
+  def check?(player, board)
     board.each do |line|
       line.each do |tile|
         if tile && tile.color != COLOR_OF_PLAYERS[player]
