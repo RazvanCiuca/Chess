@@ -2,7 +2,7 @@
 require_relative "./pieces.rb"
 require_relative "./board.rb"
 require "colorize"
-require "YAML"
+COLOR_OF_PLAYERS = {0 => :white, 1 => :black, :white => 0, :black => 1}
 
 class HumanPlayer
   attr_accessor :color
@@ -27,13 +27,12 @@ class HumanPlayer
 end
 
 class Game
-  COLOR_OF_PLAYERS = {0 => :white, 1 => :black}
+
 
   def initialize
     @board_object = Board.new
     @board = @board_object.board
     @players = [HumanPlayer.new(:white), HumanPlayer.new(:black)]
-    @king_position = [[7, 4], [0, 4]]
     @turn = 0
   end
 
@@ -48,15 +47,15 @@ class Game
         retry
       end
       #check if current player has checked his opponent
-      if check?(1 - @turn, @board)
+      if check?(1 - @turn, @board_object)
         if mate?
-          p "#{@players[@turn].color.capitalize} crushed #{@players[1 - @turn].color}"
+          p "#{@players[@turn].color.capitalize} gave #{@players[1 - @turn].color} the D"
           @board_object.display
           break
         end
         p "Check for #{1 - @turn}"
       end
-
+      #change whose turn it is
       @turn = 1 - @turn
     end
   end
@@ -67,6 +66,9 @@ class Game
       line.each_with_index do |tile, j|
         if tile
           new_board.board[i][j] = @board[i][j].class.new([i,j], tile.color)
+          if tile.symbol == "\xe2\x99\x9a"
+            new_board.king_positions[COLOR_OF_PLAYERS[tile.color]] = [i, j]
+          end
         end
       end
     end
@@ -74,28 +76,22 @@ class Game
     new_board
   end
 
-  def mate?
+  def mate? #checks if opponent is mated
     @board.each do |line|
       line.each do |tile|
+        #for each of the opponent's pieces,
         if tile && tile.color != COLOR_OF_PLAYERS[@turn]
+          #try to perform that piece's every possible move
           possible_moves = tile.possible_moves(@board)
           possible_moves.each do |destination|
             move = tile.position + destination
-            new_board = dup
-            if @board[move[0]][move[1]].symbol == "\xe2\x99\x9a"
-              @king_position[1 - @turn] = move[2..3]
-            end
-            new_board.move(move[0..1], move[2..3])
+            new_board = dup #make a temporary copy of the board
+            new_board.move(move[0..1], move[2..3]) #simulate the move
             new_board.board[move[2]][move[3]].position = move[2..3]
-            if !check?(1 - @turn, new_board.board)
-              @king_position[1 - @turn] = move[0..1]
-              return false
-            end
-
+            #return false if there is a possible move that results in no check
+            return false if !check?(1 - @turn, new_board)
           end
-
         end
-
       end
     end
     true
@@ -111,10 +107,6 @@ class Game
     unless check_move(move)
       raise ArgumentError.new "Move is not valid"
     end
-    #keep track of the Kings' positions
-    if @board[move[0]][move[1]].symbol == "\xe2\x99\x9a"
-      @king_position[@turn] = move[2..3]
-    end
 
     @board_object.move(move[0..1], move[2..3])
     @board[move[2]][move[3]].position = move[2..3]
@@ -129,28 +121,20 @@ class Game
     end
     #dup the board
     new_board = dup
-
-    if @board[move[0]][move[1]].symbol == "\xe2\x99\x9a"
-      @king_position[@turn] = move[2..3]
-    end
     new_board.move(move[0..1], move[2..3])
     new_board.board[move[2]][move[3]].position = move[2..3]
-
     #check yourself before you wreck yourself
-    if check?(@turn, new_board.board)
-      @king_position[@turn] = move[0..1]
-      return false
-    end
-
+    return false if check?(@turn, new_board)
     true
   end
 
-  def check?(player, board)
+  def check?(player, board_object)
+    board = board_object.board
     board.each do |line|
       line.each do |tile|
         if tile && tile.color != COLOR_OF_PLAYERS[player]
           danger_zone = tile.possible_moves(board)
-          if danger_zone.include?(@king_position[1 - @turn])
+          if danger_zone.include?(board_object.king_positions[player])
             return true
           end
         end

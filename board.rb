@@ -2,11 +2,13 @@
 class Board
   COLORS = {:white => :red, :black => :black}
 
-  attr_accessor :board
+  attr_accessor :board, :king_positions
 
   def initialize(with_pieces = true)
-    @board = Array.new(8) { Array.new(8, nil) } #make 8 x 8 empty board
+    @board = Array.new(8) { Array.new(8, nil) }
+    @king_positions = [nil,nil] #make 8 x 8 empty board
     if with_pieces
+      @king_positions = [[7, 4], [0, 4]]
       pieces = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
       #make black special pieces
       pieces.each_with_index do |piece, i|
@@ -46,10 +48,14 @@ class Board
   end
 
   def move(origin, destination)
-    origin_x, origin_y = origin
-    destination_x, destination_y = destination
-    @board[destination_x][destination_y] = @board[origin_x][origin_y]
-    @board[origin_x][origin_y] = nil
+    o_x, o_y = origin
+    d_x, d_y = destination
+    tile = @board[o_x][o_y]
+    if tile.symbol == "\xe2\x99\x9a"
+      @king_positions[ COLOR_OF_PLAYERS[tile.color] ] = [d_x, d_y]
+    end
+    @board[d_x][d_y] = tile
+    @board[o_x][o_y] = nil
   end
 
 
